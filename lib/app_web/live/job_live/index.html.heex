@@ -1,0 +1,41 @@
+<.header>
+  Listing Jobs
+  <:actions>
+    <.link patch={~p"/jobs/new"}>
+      <.button>New Job</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="jobs" rows={@jobs} row_click={&JS.navigate(~p"/jobs/#{&1}")}>
+  <:col :let={job} label="Working day"><%= job.working_day %></:col>
+  <:col :let={job} label="Hours worked"><%= job.hours_worked %></:col>
+  <:col :let={job} label="Work description"><%= job.work_description %></:col>
+  <:action :let={job}>
+    <div class="sr-only">
+      <.link navigate={~p"/jobs/#{job}"}>Show</.link>
+    </div>
+    <.link patch={~p"/jobs/#{job}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={job}>
+    <.link phx-click={JS.push("delete", value: %{id: job.id})} data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="job-modal"
+  show
+  on_cancel={JS.navigate(~p"/jobs")}
+>
+  <.live_component
+    module={AppWeb.JobLive.FormComponent}
+    id={@job.id || :new}
+    title={@page_title}
+    action={@live_action}
+    job={@job}
+    navigate={~p"/jobs"}
+  />
+</.modal>
